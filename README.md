@@ -1,10 +1,15 @@
 #  Graphic Walker DSL Parser 
 
-The project is currently in testing & validation. Welcome community to raise issues and contribute code.
+> The project is currently in testing & validation. Welcome the community to raise issues and contribute code.
 
 ## Introduction
 
-This project convert Graphic Walker DSL into SQL. By integrating with Graphic Walker's server-side mode, it pushes down computations to the query engine for improved performance.
+![./LICENSE](https://img.shields.io/github/license/kanaries/gw-dsl-parser?style=flat-square)
+[![](https://img.shields.io/badge/twitter-kanaries_data-03A9F4?style=flat-square&logo=twitter)](https://twitter.com/kanaries_data)
+[![](https://img.shields.io/discord/987366424634884096?color=%237289da&label=Discord&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/WWHraZ8SeV)
+[![](https://img.shields.io/badge/Slack-green?style=flat-square&logo=slack&logoColor=white)](https://kanaries-community.slack.com/join/shared_invite/zt-20hho6t45-_OSDdTQamnrSnOW6C2PTgg)
+
+This project converts Graphic Walker DSL into SQL, which is needed for connecting Graphic Walker with databases/OLAP/data services. By integrating with Graphic Walker's server-side mode, it pushes down computations to the query engine for improved performance.
 
 * Leverage the query engine for faster processing instead of pulling all data to the application layer
 * Reduce data transfer between database and application server
@@ -17,15 +22,14 @@ Regarding the definition of the Graphic Walker DSL and how to integrate it,
 please refer to the Graphic Walker documentation. Here we will focus on describing how to use the SDK.
 
 
-Before integrating, we need to understand two parameters: Dataset and GraphicWalkerDSL. 
+Before integrating, we need to understand two parameters: `Dataset` and `GraphicWalkerDSL`. 
 
-- DSL : GraphicWalkerDSL is the serialized DSL obtained by passing GraphicWalker directly to the backend.
-
-- Dataset is your abstraction of the data source.  
+- `GraphicWalkerDSLDSL`: `GraphicWalkerDSL` is the serialized DSL obtained by passing GraphicWalker directly to the backend.
+- `Dataset` is your abstraction of the data source.  
 
 For example: 
-- if you want to query a PG table called 'student', you need to construct dataset: type = 'table', source = 'student'. 
-- If source is sub query like 'select * from student limit 10', then you can do:  type = 'sub_query', source = 'select * from student limit 10'.
+- If you want to query a PG table called ***"student"***, you need to construct ***"dataset"***: ` type = 'table', source = 'student' `. 
+- If source is sub query like `select * from student limit 10`, then you can do:  ` type = 'sub_query', source = 'select * from student limit 10' `.
 
 ```go
 package main
@@ -72,14 +76,14 @@ func main() {
 
 ```
 
-## Supported databases: 
+## Supported databases
 
-- Postgresql ✅
-- DuckDB ✅
-- CubeJS ✅
+- [x] Postgresql
+- [x] DuckDB
+- [x] CubeJS
     
 
-## How to run in other languages:
+## How to run in other languages
 We provide a WebAssembly compiled version that you can execute with the following commands:
     
 ```bash
@@ -91,7 +95,7 @@ Or you can use our precompiled wasm build artifact
 This loads the WebAssembly module, instantiates it, and calls the 'main' export to execute it.
 me
 
-## Feature
+## Features
 
 - More database support ( Snowflake, ClickHouse, etc.)
 - SQL syntax compatibility test
