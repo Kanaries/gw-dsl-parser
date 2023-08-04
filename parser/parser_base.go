@@ -5,7 +5,7 @@ import (
 	pgparser "github.com/auxten/postgresql-parser/pkg/sql/parser"
 	"github.com/auxten/postgresql-parser/pkg/sql/sem/tree"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/foghorn-tech/kanaries-dsl/common"
+	"github.com/kanaries/gw-dsl-parser/common"
 	"go/constant"
 	"strconv"
 	"strings"

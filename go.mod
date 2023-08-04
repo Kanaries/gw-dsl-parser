@@ -1,12 +1,10 @@
-module github.com/foghorn-tech/kanaries-dsl
+module github.com/kanaries/gw-dsl-parser
 
 go 1.18
 
 require (
 	github.com/auxten/postgresql-parser v1.0.2-0.20230627131125-788cca713dd6
 	github.com/cloudwego/hertz v0.6.5
-	github.com/gorilla/mux v1.8.0
-	github.com/mattn/go-sqlite3 v1.14.17
 )
 
 require (

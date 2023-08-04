@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"syscall/js"
 
-	"github.com/foghorn-tech/kanaries-dsl/parser"
+	"github.com/kanaries/gw-dsl-parser/parser"
 )
 
 func dslToSql(this js.Value, args []js.Value) interface{} {

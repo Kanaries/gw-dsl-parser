@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/foghorn-tech/kanaries-dsl/common"
+	"github.com/kanaries/gw-dsl-parser/common"
 	"strings"
 	"testing"
 )
