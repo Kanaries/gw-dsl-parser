@@ -59,6 +59,7 @@ func (p BaseParser) parseDSLToSQL(payload GraphicWalkerDSL, from tree.From) (str
 	var selectExprList tree.SelectExprs
 	var subSelectExprList tree.SelectExprs
 	var groupExprList tree.GroupBy
+	var orderBy *tree.OrderBy
 	for _, node := range payload.Workflow {
 		switch node.Type {
 		case common.WorkflowNodeTypeFilter:
@@ -91,6 +92,27 @@ func (p BaseParser) parseDSLToSQL(payload GraphicWalkerDSL, from tree.From) (str
 					groupExprList = viewGroup
 				}
 			}
+		case common.WorkflowNodeTypeSort:
+			{
+				var orderByExpr tree.OrderBy
+				if node.Descending() != nil {
+					var direction tree.Direction
+					if *node.Descending() {
+						direction = tree.Descending
+					} else {
+						direction = tree.Ascending
+					}
+					for _, sort := range node.By {
+						sortExpr := tree.Order{
+							OrderType: tree.OrderByColumn,
+							Direction: direction,
+							Expr:      tree.NewUnresolvedName(sort),
+						}
+						orderByExpr = append(orderByExpr, &sortExpr)
+					}
+					orderBy = &orderByExpr
+				}
+			}
 		}
 	}
 
@@ -98,6 +120,7 @@ func (p BaseParser) parseDSLToSQL(payload GraphicWalkerDSL, from tree.From) (str
 		selectExprList = append(selectExprList, tree.SelectExpr{})
 	}
 
+	//limit
 	limitNode := tree.Limit{}
 	if payload.Limit != 0 {
 		offset := payload.Offset
@@ -105,6 +128,11 @@ func (p BaseParser) parseDSLToSQL(payload GraphicWalkerDSL, from tree.From) (str
 			Count:  tree.NewDInt(tree.DInt(payload.Limit)),
 			Offset: tree.NewDInt(tree.DInt(offset)),
 		}
+	}
+
+	//order by
+	if orderBy != nil {
+		ast.OrderBy = *orderBy
 	}
 
 	//where
