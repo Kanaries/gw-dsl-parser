@@ -1,5 +1,7 @@
 package parser
 
+import "github.com/kanaries/gw-dsl-parser/common"
+
 type RangeFilterRule struct {
 	Type  string
 	Value [2]float64
@@ -68,10 +70,9 @@ type ConstantExpParameter struct {
 }
 
 type GraphicWalkerDSL struct {
-	DatasetId string       `json:"datasetId"`
-	Workflow  []IBaseQuery `json:"workflow"`
-	Limit     int          `json:"limit"`
-	Offset    int          `json:"offset"`
+	Workflow []IBaseQuery `json:"workflow"`
+	Limit    int          `json:"limit"`
+	Offset   int          `json:"offset"`
 }
 
 type IBaseQuery struct {
@@ -79,7 +80,24 @@ type IBaseQuery struct {
 	Query     []Query     `json:"query"`
 	Filters   []Filter    `json:"filters"`
 	Transform []Transform `json:"transform"`
+	Sort      string      `json:"sort"` //'ascending' | 'descending'
+	By        []string    `json:"by"`
 }
+
+func (query IBaseQuery) Descending() *bool {
+	if len(query.Sort) == 0 {
+		return nil
+	}
+	if query.Sort == SortDescending {
+		return common.BoolPtr(true)
+	}
+	return common.BoolPtr(false)
+}
+
+const (
+	SortAscending  = "ascending"
+	SortDescending = "descending"
+)
 
 type Query struct {
 	Op      string   `json:"op"`

@@ -9,6 +9,70 @@ import (
 	"testing"
 )
 
+func TestOrderBy(t *testing.T) {
+	query := `
+	{
+	  "workflow": [
+		{
+		  "type": "view",
+		  "query": [
+			{
+			  "op": "raw",
+			  "fields": [
+				"col_2"
+			  ]
+			}
+		  ]
+		},
+		{
+		  "type": "sort",
+		  "sort": "ascending",
+		  "by": ["col_2"]
+		}
+	  ]
+	}
+	`
+	sql := "SELECT col_2 FROM table1 ORDER BY col_2 ASC"
+	dataset := Dataset{
+		Source: "table1",
+		Type:   common.DatasetTypeTable,
+	}
+	err := testParser(query, sql, dataset, t)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestLimit(t *testing.T) {
+	query := `
+	{
+	  "workflow": [
+		{
+		  "type": "view",
+		  "query": [
+			{
+			  "op": "raw",
+			  "fields": [
+				"col_2"
+			  ]
+			}
+		  ]
+		}
+	  ],
+	  "limit": 10
+	}
+	`
+	sql := "SELECT col_2 FROM table1 LIMIT 10 OFFSET 0"
+	dataset := Dataset{
+		Source: "table1",
+		Type:   common.DatasetTypeTable,
+	}
+	err := testParser(query, sql, dataset, t)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestRaw(t *testing.T) {
 	query := `
 	{
@@ -37,6 +101,7 @@ func TestRaw(t *testing.T) {
 		t.Error(err)
 	}
 }
+
 func TestRange(t *testing.T) {
 	query := `
 	{

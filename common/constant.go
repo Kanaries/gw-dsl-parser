@@ -4,6 +4,7 @@ const (
 	WorkflowNodeTypeFilter    = "filter"
 	WorkflowNodeTypeView      = "view"
 	WorkflowNodeTypeTransform = "transform"
+	WorkflowNodeTypeSort      = "sort"
 )
 
 const (
