@@ -450,6 +450,55 @@ func TestBin(t *testing.T) {
 	}
 }
 
+func TestNumBin(t *testing.T) {
+	query := `
+	{
+	  "workflow": [
+		{
+		  "type": "transform",
+		  "transform": [
+			{
+			  "fid": "gw_Kr7j",
+			  "expression": {
+				"op": "bin",
+				"as": "gw_Kr7j",
+				"params": [
+				  {
+					"type": "field",
+					"value": "col_1"
+				  }
+				],
+				"num" : 5
+			  }
+			}
+		  ]
+		},
+		{
+		  "type": "view",
+		  "query": [
+			{
+			  "op": "raw",
+			  "fields": [
+				"gw_Kr7j",
+				"col_13"
+			  ]
+			}
+		  ]
+		}
+	  ]
+	}
+	`
+	sql := "SELECT \"min_gw_Kr7j\" + (least(floor((col_1 - \"min_gw_Kr7j\") / ((\"max_gw_Kr7j\" - \"min_gw_Kr7j\") / 5.0)), 4) * ((\"max_gw_Kr7j\" - \"min_gw_Kr7j\") / 5.0)) AS \"gw_Kr7j\", col_13 FROM (SELECT *, max(col_1) OVER () AS \"max_gw_Kr7j\", min(col_1) OVER () AS \"min_gw_Kr7j\" FROM table1) AS kanaries_sub_query"
+	dataset := Dataset{
+		Source: "table1",
+		Type:   common.DatasetTypeTable,
+	}
+	err := testParser(query, sql, dataset, t)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestBinCount(t *testing.T) {
 	query := `
 	{
@@ -496,6 +545,55 @@ func TestBinCount(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestNumBinCount(t *testing.T) {
+	query := `
+	{
+	  "workflow": [
+		{
+		  "type": "transform",
+		  "transform": [
+			{
+			  "fid": "gw_ZM8H",
+			  "expression": {
+				"op": "binCount",
+				"as": "gw_ZM8H",
+				"params": [
+				  {
+					"type": "field",
+					"value": "col_3"
+				  }
+				],
+				"num" : 5
+			  }
+			}
+		  ]
+		},
+		{
+		  "type": "view",
+		  "query": [
+			{
+			  "op": "raw",
+			  "fields": [
+				"gw_ZM8H"
+			  ]
+			}
+		  ]
+		}
+	  ]
+	}
+	`
+	sql := "SELECT least((col_3 - \"min_gw_ZM8H\") / ((\"max_gw_ZM8H\" - \"min_gw_ZM8H\") / 5), 4) + 1 AS \"gw_ZM8H\" FROM (SELECT *, max(col_3) OVER () AS \"max_gw_ZM8H\", min(col_3) OVER () AS \"min_gw_ZM8H\" FROM table1) AS kanaries_sub_query"
+	dataset := Dataset{
+		Source: "table1",
+		Type:   common.DatasetTypeTable,
+	}
+	err := testParser(query, sql, dataset, t)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestLog10(t *testing.T) {
 	query := `
 	{

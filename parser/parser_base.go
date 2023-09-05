@@ -268,6 +268,11 @@ func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.S
 	switch transform.Expression.Op {
 	case "bin":
 		param := transform.Expression.Params[0]
+		num := transform.Expression.Num
+		if num <= 0 {
+			num = 10
+		}
+		minNum := num - 1
 		expr = &tree.SelectExpr{
 			Expr: &tree.BinaryExpr{
 				Operator: tree.Plus,
@@ -305,13 +310,13 @@ func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.S
 														Right:    tree.NewUnresolvedName(fmt.Sprintf("min_%s", transform.Expression.As)),
 													},
 												},
-												Right: tree.NewNumVal(constant.MakeFloat64(10.0), "10.0", false),
+												Right: tree.NewNumVal(constant.MakeFloat64(float64(num)), strconv.FormatFloat(float64(num), 'f', 1, 64), false),
 											},
 										},
 									},
 								},
 							},
-							tree.NewNumVal(constant.MakeInt64(9), "9", false),
+							tree.NewNumVal(constant.MakeInt64(minNum), strconv.FormatInt(minNum, 10), false),
 						},
 					},
 					Right: &tree.ParenExpr{
@@ -324,7 +329,7 @@ func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.S
 									Right:    tree.NewUnresolvedName(fmt.Sprintf("min_%s", transform.Expression.As)),
 								},
 							},
-							Right: tree.NewNumVal(constant.MakeFloat64(10.0), "10.0", false),
+							Right: tree.NewNumVal(constant.MakeFloat64(float64(num)), strconv.FormatFloat(float64(num), 'f', 1, 64), false),
 						},
 					},
 				},
@@ -358,6 +363,11 @@ func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.S
 			},
 		}
 	case "binCount":
+		num := transform.Expression.Num
+		if num <= 0 {
+			num = 10
+		}
+		minNum := num - 1
 		param := transform.Expression.Params[0]
 		expr = &tree.SelectExpr{
 			Expr: &tree.BinaryExpr{
@@ -388,11 +398,11 @@ func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.S
 											Right:    tree.NewUnresolvedName(fmt.Sprintf("min_%s", transform.Expression.As)),
 										},
 									},
-									Right: tree.NewNumVal(constant.MakeInt64(10), "10", false),
+									Right: tree.NewNumVal(constant.MakeInt64(num), strconv.FormatInt(num, 10), false),
 								},
 							},
 						},
-						tree.NewNumVal(constant.MakeInt64(9), "9", false),
+						tree.NewNumVal(constant.MakeInt64(minNum), strconv.FormatInt(minNum, 10), false),
 					},
 				},
 				Right: tree.NewNumVal(constant.MakeInt64(1), "1", false),
