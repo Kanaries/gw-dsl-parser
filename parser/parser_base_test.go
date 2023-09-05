@@ -898,6 +898,55 @@ func TestMean(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestLog(t *testing.T) {
+	query := `
+	{
+	  "workflow": [
+		{
+		  "type": "transform",
+		  "transform": [
+			{
+			  "fid": "gw_f23i",
+			  "expression": {
+				"op": "log",
+				"as": "gw_f23i",
+				"params": [
+				  {
+					"type": "field",
+					"value": "col_1"
+				  }
+				],
+				"num": 3
+			  }
+			}
+		  ]
+		},
+		{
+		  "type": "view",
+		  "query": [
+			{
+			  "op": "raw",
+			  "fields": [
+				"gw_f23i",
+				"col_1"
+			  ]
+			}
+		  ]
+		}
+	  ]
+	}`
+	sql := "SELECT log(col_1) / log(3) AS gw_f23i, col_1 FROM table1"
+	dataset := Dataset{
+		Source: "table1",
+		Type:   common.DatasetTypeTable,
+	}
+	err := testParser(query, sql, dataset, t)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func testParser(query, sql string, dataset Dataset, t *testing.T) error {
 	baseParser := BaseParser{}
 	var payload GraphicWalkerDSL

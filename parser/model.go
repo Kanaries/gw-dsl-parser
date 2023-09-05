@@ -154,4 +154,5 @@ type IExpression struct {
 	Op     string          `json:"op"`
 	Params []IExpParameter `json:"params"`
 	As     string          `json:"as"`
+	Num    int64           `json:"num"`
 }

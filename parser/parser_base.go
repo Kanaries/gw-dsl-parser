@@ -475,6 +475,31 @@ func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.S
 			},
 			As: tree.UnrestrictedName(transform.Expression.As),
 		}
+	case "log":
+		param := transform.Expression.Params[0]
+		num := transform.Expression.Num
+		expr = &tree.SelectExpr{
+			Expr: &tree.BinaryExpr{
+				Operator: tree.Div,
+				Left: &tree.FuncExpr{
+					Func: tree.ResolvableFunctionReference{
+						FunctionReference: tree.NewUnresolvedName("log"),
+					},
+					Exprs: tree.Exprs{
+						tree.NewUnresolvedName(param.Value),
+					},
+				},
+				Right: &tree.FuncExpr{
+					Func: tree.ResolvableFunctionReference{
+						FunctionReference: tree.NewUnresolvedName("log"),
+					},
+					Exprs: tree.Exprs{
+						tree.NewNumVal(constant.MakeInt64(num), strconv.FormatInt(num, 10), false),
+					},
+				},
+			},
+			As: tree.UnrestrictedName(transform.Expression.As),
+		}
 	}
 	existCol[transform.Expression.As] = expr
 
