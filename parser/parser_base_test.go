@@ -1045,6 +1045,49 @@ func TestLog(t *testing.T) {
 	}
 }
 
+func TestTimeDrill(t *testing.T) {
+	query := `
+	{
+		"workflow": [{
+			"type": "transform",
+			"transform": [{
+				"key": "gw_MRzB",
+				"expression": {
+					"op": "dateTimeDrill",
+					"as": "gw_MRzB",
+					"params": [{
+						"type": "field",
+						"value": "c_0"
+					}, {
+						"type": "value",
+						"value": "week"
+					}]
+				}
+			}]
+		}, {
+			"type": "view",
+			"query": [{
+				"op": "aggregate",
+				"groupBy": ["gw_MRzB"],
+				"measures": [{
+					"field": "c_11",
+					"agg": "sum",
+					"asFieldKey": "c_11_sum"
+				}]
+			}]
+		}]
+	}`
+	sql := "SELECT to_char(date_trunc(c_0, 'week'), 'YYYY-MM-DD') AS \"gw_MRzB\", sum(c_11) AS c_11_sum FROM table1 GROUP BY \"gw_MRzB\""
+	dataset := Dataset{
+		Source: "table1",
+		Type:   common.DatasetTypeTable,
+	}
+	err := testParser(query, sql, dataset, t)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func testParser(query, sql string, dataset Dataset, t *testing.T) error {
 	baseParser := BaseParser{}
 	var payload GraphicWalkerDSL

@@ -79,7 +79,9 @@ func (p BaseParser) parseDSLToSQL(payload GraphicWalkerDSL, from tree.From) (str
 							subSelectExprList = append(subSelectExprList, subExpr)
 						}
 					}
-					selectExprList = append(selectExprList, *expr)
+					if expr != nil {
+						selectExprList = append(selectExprList, *expr)
+					}
 				}
 			}
 		case common.WorkflowNodeTypeView:
@@ -262,7 +264,7 @@ func (BaseParser) GetWhereExpr(filter Filter) tree.Expr {
 	return nil
 }
 
-func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.SelectExpr) (*tree.SelectExpr, tree.SelectExprs, map[string]*tree.SelectExpr) {
+func (base BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.SelectExpr) (*tree.SelectExpr, tree.SelectExprs, map[string]*tree.SelectExpr) {
 	var expr *tree.SelectExpr
 	var subExprs tree.SelectExprs
 	switch transform.Expression.Op {
@@ -510,6 +512,40 @@ func (BaseParser) GetSelectExpr(transform Transform, existCol map[string]*tree.S
 			},
 			As: tree.UnrestrictedName(transform.Expression.As),
 		}
+	case "dateTimeDrill":
+		ast, _ := pgparser.ParseOne("SELECT TO_CHAR(\n  DATE_TRUNC('year', to_timestamp(col_1, 'YYYY-MM-DD')),\n  'YYYY'\n)")
+		println(ast.AST.String())
+		field := ""
+		value := ""
+		for _, param := range transform.Expression.Params {
+			if param.Type == "field" {
+				field = param.Value
+			}
+			if param.Type == "value" {
+				value = param.Value
+			}
+		}
+		formatExpr, truncExpr := base.GetDataTruncExpr(value)
+		expr = &tree.SelectExpr{
+			Expr: &tree.FuncExpr{
+				Func: tree.ResolvableFunctionReference{
+					FunctionReference: tree.NewUnresolvedName("to_char"),
+				},
+				Exprs: tree.Exprs{
+					&tree.FuncExpr{
+						Func: tree.ResolvableFunctionReference{
+							FunctionReference: tree.NewUnresolvedName("date_trunc"),
+						},
+						Exprs: tree.Exprs{
+							tree.NewUnresolvedName(field),
+							tree.NewStrVal(truncExpr),
+						},
+					},
+					tree.NewStrVal(formatExpr),
+				},
+			},
+			As: tree.UnrestrictedName(transform.Expression.As),
+		}
 	}
 	existCol[transform.Expression.As] = expr
 
@@ -627,6 +663,35 @@ func (BaseParser) GetAggFunc(agg IAggregator) string {
 	}
 }
 
+func (BaseParser) GetDataTruncExpr(funcType string) (formatExpr, dataTruncExpr string) {
+	switch funcType {
+	case "year":
+		formatExpr = "YYYY"
+		dataTruncExpr = "year"
+	case "month":
+		formatExpr = "YYYY-MM"
+		dataTruncExpr = "month"
+	case "week":
+		formatExpr = "YYYY-MM-DD"
+		dataTruncExpr = "week"
+	case "day":
+		formatExpr = "YYYY-MM-DD"
+		dataTruncExpr = "day"
+	case "hour":
+		formatExpr = "YYYY-MM-DD HH24"
+		dataTruncExpr = "hour"
+	case "minute":
+		formatExpr = "YYYY-MM-DD HH24:MI"
+		dataTruncExpr = "minute"
+	case "second":
+		formatExpr = "YYYY-MM-DD HH24:MI:SS"
+		dataTruncExpr = "second"
+	default:
+		formatExpr = "YYYY-MM-DD HH24:MI:SS"
+		dataTruncExpr = "second"
+	}
+	return
+}
 func getWhereFromExprList(exprList tree.Exprs) tree.Expr {
 	if len(exprList) == 1 {
 		return exprList[0]
