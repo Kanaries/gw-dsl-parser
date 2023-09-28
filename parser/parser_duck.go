@@ -49,8 +49,14 @@ func (p DuckDBParser) Parse(dataset Dataset, dsl GraphicWalkerDSL) (string, erro
 
 	allocate := instance.GetExport(store, "allocate").Func()
 	deallocate := instance.GetExport(store, "deallocate").Func()
-	tableAddress := writeStringToWasm(instance, store, allocate, dataset.Source)
-	dslAddress := writeStringToWasm(instance, store, allocate, string(dslStr))
+	tableAddress, err := writeStringToWasm(instance, store, allocate, dataset.Source)
+	if err != nil {
+		return "", err
+	}
+	dslAddress, err := writeStringToWasm(instance, store, allocate, string(dslStr))
+	if err != nil {
+		return "", err
+	}
 	var wasmFunc *wasmtime.Func
 	if dataset.Type == "table" {
 		wasmFunc = instance.GetExport(store, "parser_dsl_with_table").Func()
@@ -73,16 +79,16 @@ func (p DuckDBParser) Parse(dataset Dataset, dsl GraphicWalkerDSL) (string, erro
 const wasmMemory = "memory"
 
 // a string is serialized as 4 byte length + content + trailing zero
-func writeStringToWasm(inst *wasmtime.Instance, store *wasmtime.Store, fn *wasmtime.Func, s string) int32 {
+func writeStringToWasm(inst *wasmtime.Instance, store *wasmtime.Store, fn *wasmtime.Func, s string) (int32, error) {
 	vaddr, e := fn.Call(store, int32(len(s)+1))
 	if e != nil {
-		panic(e)
+		return 0, e
 	}
 	mem := inst.GetExport(store, wasmMemory).Memory().UnsafeData(store)
 	addr := vaddr.(int32)
 	copy(mem[addr:], s)
 	mem[addr+int32(len(s))] = 0
-	return addr
+	return addr, e
 }
 
 func readStringFromWasm(inst *wasmtime.Instance, store *wasmtime.Store, addr int32) string {
