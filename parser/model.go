@@ -70,18 +70,18 @@ type ConstantExpParameter struct {
 }
 
 type GraphicWalkerDSL struct {
-	Workflow []IBaseQuery `json:"workflow"`
-	Limit    int          `json:"limit"`
-	Offset   int          `json:"offset"`
+	Workflow []IBaseQuery `json:"workflow,omitempty"`
+	Limit    int          `json:"limit,omitempty"`
+	Offset   int          `json:"offset,omitempty"`
 }
 
 type IBaseQuery struct {
-	Type      string      `json:"type"`
-	Query     []Query     `json:"query"`
-	Filters   []Filter    `json:"filters"`
-	Transform []Transform `json:"transform"`
-	Sort      string      `json:"sort"` //'ascending' | 'descending'
-	By        []string    `json:"by"`
+	Type      string      `json:"type,omitempty"`
+	Query     []Query     `json:"query,omitempty"`
+	Filters   []Filter    `json:"filters,omitempty"`
+	Transform []Transform `json:"transform,omitempty"`
+	Sort      string      `json:"sort,omitempty"` //'ascending' | 'descending'
+	By        []string    `json:"by,omitempty"`
 }
 
 func (query IBaseQuery) Descending() *bool {
@@ -100,23 +100,23 @@ const (
 )
 
 type Query struct {
-	Op      string   `json:"op"`
-	GroupBy []string `json:"groupBy"`
+	Op      string   `json:"op,omitempty"`
+	GroupBy []string `json:"groupBy,omitempty"`
 	//Agg     map[string]IAggregator `json:"agg"`
-	Measures []Measure `json:"measures"`
-	Fields   []string  `json:"fields"`
+	Measures []Measure `json:"measures,omitempty"`
+	Fields   []string  `json:"fields,omitempty"`
 }
 
 type Measure struct {
-	Field      string      `json:"field"`
-	Agg        IAggregator `json:"agg"`
-	AsFieldKey string      `json:"asFieldKey"`
+	Field      string      `json:"field,omitempty"`
+	Agg        IAggregator `json:"agg,omitempty"`
+	AsFieldKey string      `json:"asFieldKey,omitempty"`
 }
 
 type Filter struct {
-	Key  string      `json:"key"`
-	Fid  string      `json:"fid"`
-	Rule IFilterRule `json:"rule"`
+	Key  string      `json:"key,omitempty"`
+	Fid  string      `json:"fid,omitempty"`
+	Rule IFilterRule `json:"rule,omitempty"`
 }
 
 type IAggregator string
@@ -133,9 +133,9 @@ const (
 )
 
 type IFilterRule struct {
-	Type IFilter `json:"type"`
+	Type IFilter `json:"type,omitempty"`
 	//todo interface
-	Value []interface{} `json:"value"`
+	Value []interface{} `json:"value,omitempty"`
 }
 
 type IFilter string
@@ -147,12 +147,12 @@ const (
 )
 
 type Transform struct {
-	Expression IExpression `json:"expression"`
+	Expression IExpression `json:"expression,omitempty"`
 }
 
 type IExpression struct {
-	Op     string          `json:"op"`
-	Params []IExpParameter `json:"params"`
-	As     string          `json:"as"`
-	Num    int64           `json:"num"`
+	Op     string          `json:"op,omitempty"`
+	Params []IExpParameter `json:"params,omitempty"`
+	As     string          `json:"as,omitempty"`
+	Num    int64           `json:"num,omitempty"`
 }

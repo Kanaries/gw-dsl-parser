@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/auxten/postgresql-parser v1.0.2-0.20230627131125-788cca713dd6
+	github.com/bytecodealliance/wasmtime-go v1.0.0
 	github.com/cloudwego/hertz v0.6.5
 )
 
