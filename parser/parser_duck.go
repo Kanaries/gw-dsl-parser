@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"github.com/bytecodealliance/wasmtime-go"
 )
 
 type DuckDBParser struct {

@@ -55,7 +55,7 @@ func TestWasmRuntime(t *testing.T) {
 	res, err := parser.Parse(Dataset{
 		Type:   "table",
 		Source: "t_1222",
-	}, payload)
+	}, payload, "{\"t_1222\":[{\"key\":\"c_0\",\"type\":\"datetime\",\"name\":\"c_0\",\"fid\":\"c_0\"}]}")
 	if err != nil {
 		return
 	}
