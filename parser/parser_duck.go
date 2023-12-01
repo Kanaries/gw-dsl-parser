@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"github.com/bytecodealliance/wasmtime-go"
 )
 
 type DuckDBParser struct {
@@ -37,7 +36,7 @@ func NewDuckDBParser() DuckDBParser {
 	return DuckDBParser{}
 }
 
-func (p DuckDBParser) Parse(dataset Dataset, dsl GraphicWalkerDSL) (string, error) {
+func (p DuckDBParser) Parse(dataset Dataset, dsl GraphicWalkerDSL, meta string) (string, error) {
 	instance, err := linker.Instantiate(store, module)
 	if err != nil {
 		return "", err
@@ -57,13 +56,17 @@ func (p DuckDBParser) Parse(dataset Dataset, dsl GraphicWalkerDSL) (string, erro
 	if err != nil {
 		return "", err
 	}
+	metaAddress, err := writeStringToWasm(instance, store, allocate, string(meta))
+	if err != nil {
+		return "", err
+	}
 	var wasmFunc *wasmtime.Func
 	if dataset.Type == "table" {
 		wasmFunc = instance.GetExport(store, "parser_dsl_with_table").Func()
 	} else {
 		wasmFunc = instance.GetExport(store, "parser_dsl_with_view").Func()
 	}
-	val, err := wasmFunc.Call(store, tableAddress, dslAddress)
+	val, err := wasmFunc.Call(store, tableAddress, dslAddress, metaAddress)
 	if err != nil {
 		return "", err
 	}
