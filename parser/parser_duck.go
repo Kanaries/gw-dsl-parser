@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"encoding/json"
 	"github.com/bytecodealliance/wasmtime-go"
 )
 
@@ -37,12 +36,8 @@ func NewDuckDBParser() DuckDBParser {
 	return DuckDBParser{}
 }
 
-func (p DuckDBParser) Parse(dataset Dataset, dsl GraphicWalkerDSL, meta string) (string, error) {
+func (p DuckDBParser) Parse(dataset Dataset, dslStr []byte, meta string) (string, error) {
 	instance, err := linker.Instantiate(store, module)
-	if err != nil {
-		return "", err
-	}
-	dslStr, err := json.Marshal(dsl)
 	if err != nil {
 		return "", err
 	}

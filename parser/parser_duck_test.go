@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 )
 
@@ -46,16 +44,11 @@ func TestWasmRuntime(t *testing.T) {
     			}]
     		}]
     	}`
-	var payload GraphicWalkerDSL
-	err = json.Unmarshal([]byte(query), &payload)
-	if err != nil {
-		t.Error(fmt.Sprintf("QueryDataset error: %v", err))
-		payload.Workflow = make([]IBaseQuery, 0)
-	}
+
 	res, err := parser.Parse(Dataset{
 		Type:   "table",
 		Source: "t_1222",
-	}, payload, "{\"t_1222\":[{\"key\":\"c_0\",\"type\":\"datetime\",\"name\":\"c_0\",\"fid\":\"c_0\"}]}")
+	}, []byte(query), "{\"t_1222\":[{\"key\":\"c_0\",\"type\":\"datetime\",\"name\":\"c_0\",\"fid\":\"c_0\"}]}")
 	if err != nil {
 		return
 	}
