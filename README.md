@@ -2,6 +2,7 @@
 
 > The project is currently in testing & validation. Welcome the community to raise issues and contribute code.
 
+
 ## Introduction
 
 ![./LICENSE](https://img.shields.io/github/license/kanaries/gw-dsl-parser?style=flat-square)
@@ -28,29 +29,29 @@ Before integrating, we need to understand two parameters: `Dataset` and `Graphic
 - `Dataset` is your abstraction of the data source.  
 
 For example: 
-- If you want to query a PG table called ***"student"***, you need to construct ***"dataset"***: ` type = 'table', source = 'student' `. 
-- If source is sub query like `select * from student limit 10`, then you can do:  ` type = 'sub_query', source = 'select * from student limit 10' `.
-
+- If you want to query a Mysql table called ***"test_table"***, you need to define the `Dataset` as follows:
 ```go
 package main
 
 import (
-	"encoding/json"
-	dsl "github.com/kanaries/gw-dsl-parser/parser"
+	"github.com/kanaries/gw-dsl-parser/parser"
 )
 
 func main() {
-	// Based on the database type you need to connect to,
-	// construct the corresponding parser: DuckDB & postgresql & CubeJS
-	parser := dsl.NewPgParser()
-
-	// Construct the dataset
-	dataset := dsl.Dataset{
-		Type:   "table",
-		Source: "student",
+	// refer to this doc on how to get the API Key: ：https://github.com/Kanaries/pygwalker/wiki/How-to-get-api-key-of-kanaries%3F
+	client := parser.NewClient("ak")
+	
+	// define the fields of the dataset
+	fields := make(map[string]parser.Field)
+	fields["col_1"] = parser.Field{
+		Key:  "col_1",
+		Fid:  "col_1",
+		Type: parser.STRING,
 	}
+	// construct the dataset, name it "test_table"
+	dataset := parser.NewDataset("test_table", fields, "mysql")
 
-	// Construct the GraphicWalkerDSL
+	// query from graphic walker request
 	query := `
 	{
 	  "workflow": [
@@ -60,7 +61,7 @@ func main() {
 			{
 			  "op": "raw",
 			  "fields": [
-				"col_2"
+				"col_1"
 			  ]
 			}
 		  ]
@@ -68,10 +69,12 @@ func main() {
 	  ]
 	}
 	`
-	var graphicWalkerDSL dsl.GraphicWalkerDSL
-	_ = json.Unmarshal([]byte(query), &graphicWalkerDSL)
-	res, _ := parser.Parse(dataset, graphicWalkerDSL)
-	println(res) // SELECT col_2 FROM student
+	sql, err := client.Parse(dataset, query)
+	if err != nil {
+		println(err)
+	}
+	println(sql)
+
 }
 
 ```
@@ -80,21 +83,17 @@ func main() {
 
 - [x] Postgresql
 - [x] DuckDB
-- [x] CubeJS
+- [x] Snowflake
+- [x] MySQL
+- [x] BigQuery
+- [x] ClickHouse
+
     
 
 ## How to run in other languages
-We provide a WebAssembly compiled version that you can execute with the following commands:
-    
-```bash
-GOOS=js GOARCH=wasm go build -o main.wasm wasm_main.go
-```
 
-Or you can use our precompiled wasm build artifact
-
-This loads the WebAssembly module, instantiates it, and calls the 'main' export to execute it.
-me
-
+- python: https://github.com/Kanaries/gw-dsl-parser-py
+- js: https://www.npmjs.com/package/@kanaries/gw-dsl-parser
 ## Features
 
 - More database support ( Snowflake, ClickHouse, etc.)
